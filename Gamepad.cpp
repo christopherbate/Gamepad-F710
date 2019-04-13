@@ -25,7 +25,7 @@ const std::string f710File_evdev = "/dev/input/by-id/usb-Logitech_Logitech_Cordl
 const std::string f710File_js = "/dev/input/by-id/usb-Logitech_Logitech_Cordless_RumblePad_2-joystick";
 const std::string f710File_js_xmode = "/dev/input/js0";
 
-Gamepad::Gamepad() : m_enabled(false)
+Gamepad::Gamepad(bool autoRestart) : m_enabled(false), m_autoRestart(autoRestart)
 {
 }
 
@@ -55,8 +55,9 @@ void Gamepad::Start()
 
 bool Gamepad::ReadRaw(js_event &event)
 {
-    if (!m_enabled)
+    if (!m_input.is_open())
     {
+        m_enabled = false;
         return false;
     }
 
@@ -76,12 +77,23 @@ bool Gamepad::Read(Gamepad::GamepadEvent &event)
 {
     if (!m_enabled)
     {
-        return false;
+        if (m_autoRestart)
+        {
+            Start();
+            if(!m_enabled){
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     js_event js;
     if (!ReadRaw(js))
     {
+        m_enabled = false;
         return false;
     }
 

@@ -67,7 +67,7 @@ class Gamepad
     };
 
   public:
-    Gamepad();
+    Gamepad(bool autoRestart);
     ~Gamepad();
 
     std::string GetInfo();
@@ -101,6 +101,7 @@ class Gamepad
   private:
     std::ifstream m_input;
     bool m_enabled;
+    bool m_autoRestart;
 };
 } // namespace ctbate
 
